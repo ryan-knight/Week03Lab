@@ -32,6 +32,43 @@ public class NoteServlet extends HttpServlet
         String path = getServletContext().getRealPath("/WEB-INF/note.txt");
 
         File file = new File(path);
+        
+        //text to display when note doesn't exist
+        if(!file.exists() && request.getParameter("edit") == null)
+        {
+            Note note = new Note();
+            note.setTitle("---");
+            note.setContent("Click new note to create a note");
+            request.setAttribute("note", note);
+            request.setAttribute("createOrEdit", "New note");
+            getServletContext().getRequestDispatcher("/WEB-INF/viewnote.jsp").forward(request, response);
+            return;
+        }
+        else if(!file.exists() && request.getParameter("edit") != null)
+        {
+            Note note = new Note();
+            note.setTitle("Enter title here");
+            note.setContent("Enter content here");
+            request.setAttribute("note", note);
+            getServletContext().getRequestDispatcher("/WEB-INF/editnote.jsp").forward(request, response);
+            return;
+        }
+        
+        //if delete button is pressed
+        if (request.getParameter("delete") != null)
+        {
+            file.delete();
+            Note note = new Note();
+            note.setTitle("---");
+            note.setContent("Click new note to create a note");
+            request.setAttribute("note", note);
+            request.setAttribute("createOrEdit", "New note");
+            getServletContext().getRequestDispatcher("/WEB-INF/viewnote.jsp").forward(request, response);
+            return;
+        }
+        
+        request.setAttribute("createOrEdit", "Edit note");
+        
         FileReader fileReader = new FileReader(file);
         BufferedReader reader;
         reader = new BufferedReader(fileReader);
@@ -115,7 +152,8 @@ public class NoteServlet extends HttpServlet
         note.setContent(contentWrite);
         
         request.setAttribute("note", note);
-        
+        request.setAttribute("createOrEdit", "Edit note");
+
         getServletContext().getRequestDispatcher("/WEB-INF/viewnote.jsp").forward(request, response);
     }
 }
